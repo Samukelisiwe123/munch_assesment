@@ -1,10 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../page-objects/login-page';
 import { SortPage } from '../page-objects/sort-page';
+import { CartPage } from '../page-objects/cart-page';
+import { CheckoutPage } from '../page-objects/checkout-page';
 
 test.describe.serial('Munch QA Tech Assessment Tests', () => {
   let loginPage: LoginPage;
   let sortPage: SortPage;
+  let cartPage: CartPage;
+  let checkoutPage: CheckoutPage;
   let sharedPage: any;
 
   test.beforeAll(async ({ browser }) => {
@@ -12,6 +16,8 @@ test.describe.serial('Munch QA Tech Assessment Tests', () => {
     sharedPage = await context.newPage();
     loginPage = new LoginPage(sharedPage);
     sortPage = new SortPage(sharedPage);
+    cartPage = new CartPage(sharedPage);
+    checkoutPage = new CheckoutPage(sharedPage);
   });
 
   test.afterAll(async () => {
@@ -27,52 +33,48 @@ test.describe.serial('Munch QA Tech Assessment Tests', () => {
     // Assuming the user is already logged in from the previous test
     await sortPage.sortByPriceLowToHigh();
   });
+  
+  test('Add & Remove Cart Items', async () => {
+    // Step 1: Add 3 items to the cart
+    await cartPage.addItems(3);
+
+    // Step 2: Verify cart count = 3
+    const countAfterAdd = await cartPage.getCartCount();
+    console.log(`Cart count after adding: ${countAfterAdd}`);
+    await expect(countAfterAdd).toBe(3);
+
+    // Step 3: Remove first item
+    await cartPage.removeItemByIndex(0);
+
+    // Step 4: Verify cart count = 2
+    const countAfterRemove = await cartPage.getCartCount();
+    console.log(`Cart count after removing: ${countAfterRemove}`);
+    await expect(countAfterRemove).toBe(2);
+
+    // Step 5: Open cart and verify cart page items
+    await cartPage.openCart();
+    const cartItems = await cartPage.getCartItemCount();
+    console.log(`Items in cart page: ${cartItems}`);
+    await expect(cartItems).toBe(2);
+  });
+
+  test('end-to-end checkout flow', async () => {
+    await sharedPage.goto('https://www.saucedemo.com/');
+    await loginPage.login();
+
+    await cartPage.clearCart();
+
+    const itemPriceText = await sharedPage.locator('.inventory_item .inventory_item_price').first().textContent();
+    const itemPrice = Number(itemPriceText?.replace('$', '') ?? 0);
+
+    await cartPage.addItems(1);
+    await cartPage.openCart();
+    await cartPage.checkout();
+
+    await checkoutPage.fillCustomerInfo('Steve', 'Shongwe', '1234');
+    await checkoutPage.continueToOverview();
+    await checkoutPage.verifySummary(itemPrice);
+    await checkoutPage.completeCheckout();
+    await checkoutPage.verifySuccessMessage();
+  });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// test('has title', async ({ page }) => {
-//   await page.goto('https://playwright.dev/');
-
-//   // Expect a title "to contain" a substring.
-//   await expect(page).toHaveTitle(/Playwright/);
-// });
-
-// test('get started link', async ({ page }) => {
-//   await page.goto('https://playwright.dev/');
-
-//   // Click the get started link.
-//   await page.getByRole('link', { name: 'Get started' }).click();
-
-//   // Expects page to have a heading with the name of Installation.
-//   await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
-// });
