@@ -26,10 +26,14 @@ test.describe.serial('Munch QA Tech Assessment Tests', () => {
 
   test('should login successfully', async () => {
     await loginPage.login();
-
   });
 
-  test('should sort products by price low to high', async () => {
+  test('should show error with invalid login (Negative / Edge Case Tests)', async ({ page }) => {
+    const invalidLoginPage = new LoginPage(page);
+    await expect(invalidLoginPage.loginWithCredentials('bad_user', 'wrong_pass')).rejects.toThrow(/Epic sadface.*Username and password do not match/);
+  });
+
+  test('Product List & Sorting', async () => {
     // Assuming the user is already logged in from the previous test
     await sortPage.sortByPriceLowToHigh();
   });
@@ -58,7 +62,7 @@ test.describe.serial('Munch QA Tech Assessment Tests', () => {
     await expect(cartItems).toBe(2);
   });
 
-  test('end-to-end checkout flow', async () => {
+  test('Checkout Workflow', async () => {
     await sharedPage.goto('https://www.saucedemo.com/');
     await loginPage.login();
 

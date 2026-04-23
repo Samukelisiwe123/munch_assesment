@@ -9,44 +9,67 @@ export class LoginPage {
     readonly page: Page;
     readonly usernameInput: Locator;
     readonly passwordInput: Locator;
-    readonly loginButton: Locator;      
+    readonly loginButton: Locator;
+    readonly errorMessage: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.usernameInput = this.page.locator('[data-test="username"]');
         this.passwordInput = this.page.locator('[data-test="password"]');
         this.loginButton = this.page.locator('[data-test="login-button"]');
+        this.errorMessage = this.page.locator('[data-test="error"]');
     }
 
     async login() {
+        return this.loginWithCredentials(USERNAME, PASSWORD);
+    }
+
+    async loginWithCredentials(username: string, password: string) {
         try {
             console.log('Navigating to the login page...');
             await this.page.goto(URL, {waitUntil: 'domcontentloaded'});
 
-            // Clear and fill username
             await this.usernameInput.clear();
-            await this.usernameInput.fill(USERNAME);
-            console.log(`Entered username: ${USERNAME}`);
+            await this.usernameInput.fill(username);
+            console.log(`Entered username: ${username}`);
 
-            // Clear and fill password
             await this.passwordInput.clear();
-            await this.passwordInput.fill(PASSWORD);
-            console.log(`Entered password: ${PASSWORD}`);
+            await this.passwordInput.fill(password);
+            console.log(`Entered password: ${password}`);
 
             await this.loginButton.click();
             console.log('Clicked the login button');
 
-            await expect(this.page.getByText('Swag Labs')).toBeVisible();
-            console.log('Login successful, navigated to the next page');
+            // Wait for either success or error
+            try {
+                await Promise.race([
+                    this.page.waitForURL('**/inventory.html', { timeout: 5000 }),
+                    this.errorMessage.waitFor({ state: 'visible', timeout: 5000 })
+                ]);
+            } catch {
+                // Ignore timeout here; we'll check the state below
+            }
 
+            // Take screenshot after login attempt
+            await this.page.screenshot({ path: 'screenshots/login-attempt.png' });
 
-            const screenshot = await this.page.screenshot({ path: 'login-success.png' });
-            console.log('Screenshot taken: login-success.png');
-        }
-        catch (error) {
+            // Check if error message appeared
+            if (await this.errorMessage.isVisible()) {
+                const errorText = await this.errorMessage.textContent();
+                throw new Error(`Login failed: ${errorText}`);
+            }
+
+            console.log('Login successful');
+            return this;
+        } catch (error) {
             console.error('Error during login:', error);
-            throw error; // Rethrow the error to ensure the test fails
+            throw error;
         }
+    }
+
+    async getErrorMessage(): Promise<string> {
+        await expect(this.errorMessage).toBeVisible({ timeout: 5000 });
+        return (await this.errorMessage.textContent())?.trim() ?? '';
     }
 }
 

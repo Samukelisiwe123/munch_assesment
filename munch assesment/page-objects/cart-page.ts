@@ -32,7 +32,7 @@ export class CartPage {
             await expect(this.badge).toHaveText(String(count));
         } catch (error) {
             console.error('Error adding items to cart:', error);
-            await this.page.screenshot({ path: 'cart-add-error.png' });
+            await this.page.screenshot({ path: 'screenshots/cart-add-error.png' });
             throw error;
         }
     }
@@ -52,7 +52,7 @@ export class CartPage {
             await item.locator('button:has-text("Remove")').click();
         } catch (error) {
             console.error('Error removing item from cart:', error);
-            await this.page.screenshot({ path: 'cart-remove-error.png' });
+            await this.page.screenshot({ path: 'screenshots/cart-remove-error.png' });
             throw error;
         }
     }
@@ -80,7 +80,7 @@ export class CartPage {
             await this.page.click('.shopping_cart_link');
         } catch (error) {
             console.error('Error opening cart:', error);
-            await this.page.screenshot({ path: 'cart-open-error.png' });
+            await this.page.screenshot({ path: 'screenshots/cart-open-error.png' });
             throw error;
         }
     }
@@ -91,7 +91,7 @@ export class CartPage {
             await this.page.click('[data-test="checkout"]');
         } catch (error) {
             console.error('Error clicking checkout:', error);
-            await this.page.screenshot({ path: 'cart-checkout-error.png' });
+            await this.page.screenshot({ path: 'screenshots/cart-checkout-error.png' });
             throw error;
         }
     }
@@ -110,7 +110,7 @@ export class CartPage {
             console.log('Cleared existing cart items');
         } catch (error) {
             console.error('Error clearing cart:', error);
-            await this.page.screenshot({ path: 'cart-clear-error.png' });
+            await this.page.screenshot({ path: 'screenshots/cart-clear-error.png' });
             throw error;
         }
     }
