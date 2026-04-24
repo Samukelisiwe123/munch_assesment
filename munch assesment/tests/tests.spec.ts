@@ -34,28 +34,28 @@ test.describe.serial('Munch QA Tech Assessment Tests', () => {
   });
 
   test('Product List & Sorting', async () => {
-    // Assuming the user is already logged in from the previous test
+    
     await sortPage.sortByPriceLowToHigh();
   });
   
   test('Add & Remove Cart Items', async () => {
-    // Step 1: Add 3 items to the cart
+    // Add 3 items to the cart
     await cartPage.addItems(3);
 
-    // Step 2: Verify cart count = 3
+    // Verify cart count = 3
     const countAfterAdd = await cartPage.getCartCount();
     console.log(`Cart count after adding: ${countAfterAdd}`);
     await expect(countAfterAdd).toBe(3);
 
-    // Step 3: Remove first item
+    // Remove first item
     await cartPage.removeItemByIndex(0);
 
-    // Step 4: Verify cart count = 2
+    // Verify cart count = 2
     const countAfterRemove = await cartPage.getCartCount();
     console.log(`Cart count after removing: ${countAfterRemove}`);
     await expect(countAfterRemove).toBe(2);
 
-    // Step 5: Open cart and verify cart page items
+    // Open cart and verify cart page items
     await cartPage.openCart();
     const cartItems = await cartPage.getCartItemCount();
     console.log(`Items in cart page: ${cartItems}`);

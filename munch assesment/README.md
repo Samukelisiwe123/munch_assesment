@@ -18,7 +18,7 @@ This repository contains a Playwright test project for the assessment.
 ```bash
 npm install
 ```
-
+68
 2. Verify Playwright is installed by checking the package versions:
 
 ```bash
