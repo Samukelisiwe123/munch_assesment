@@ -12,21 +12,21 @@ export class SortPage {
         this.productPrices = this.page.locator('.inventory_item_price');
     }   
     async sortByPriceLowToHigh() {
-        // Step 1: Select "Price (low to high)"
+        // Select "Price (low to high)"
             await this.page.selectOption('.product_sort_container', 'lohi');
         
-            // Step 2: Get all product prices
+            // Get product prices
             const priceTexts = await this.page
               .locator('[data-test="inventory-item-price"]')
               .allTextContents();
         
             const prices = priceTexts.map((p: string) => Number(p.replace('$', '')));
         
-            // Step 3: Verify sorting
+            // Verify sorting
             const sortedPrices = [...prices].sort((a, b) => a - b);
             expect(prices).toEqual(sortedPrices);
         
-            // Step 4: Get titles
+            // Get titles
             const titleTexts = await this.page
               .locator('[data-test="inventory-item-name"]')
               .allTextContents();
@@ -34,10 +34,10 @@ export class SortPage {
             console.log('Product titles:', titleTexts);
             console.log('Product prices:', prices);
         
-            // Step 5: Assert title + price correctness
+            // Assert title + price correctness
             expect(titleTexts.length).toBe(prices.length);
         
-            // Example check (first item should be cheapest)
+            // Example check: Verifying that the first item is the cheapest
             expect(prices[0]).toBe(Math.min(...prices));
     }
 }

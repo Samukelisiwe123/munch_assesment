@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 
+// CheckoutPage manages the checkout steps: entering customer info, reviewing order, and completing purchase
 export class CheckoutPage {
   readonly page: Page;
   readonly firstName: Locator;
@@ -15,11 +16,13 @@ export class CheckoutPage {
 
   constructor(page: Page) {
     this.page = page;
+    // Customer info form on checkout page
     this.firstName = page.locator('[data-test="firstName"]');
     this.lastName = page.locator('[data-test="lastName"]');
     this.postalCode = page.locator('[data-test="postalCode"]');
     this.continueButton = page.locator('[data-test="continue"]');
     this.finishButton = page.locator('[data-test="finish"]');
+    // Price and total info on order review page
     this.subtotalLabel = page.locator('.summary_subtotal_label');
     this.taxLabel = page.locator('.summary_tax_label');
     this.totalLabel = page.locator('.summary_total_label');
@@ -27,6 +30,7 @@ export class CheckoutPage {
     this.errorMessage = page.locator('[data-test="error"]');
   }
 
+  // Fill in the customer name and address on the checkout form
   async fillCustomerInfo(firstName: string, lastName: string, postalCode: string) {
     try {
       await expect(this.firstName).toBeVisible({ timeout: 5000 });
@@ -41,6 +45,7 @@ export class CheckoutPage {
     }
   }
 
+  // Click continue to go to the order review page
   async continueToOverview() {
     try {
       await expect(this.continueButton).toBeVisible({ timeout: 5000 });
@@ -54,6 +59,7 @@ export class CheckoutPage {
     }
   }
 
+  // Click the continue button on the checkout form
   async clickContinue() {
     try {
       await expect(this.continueButton).toBeVisible({ timeout: 5000 });
@@ -66,6 +72,7 @@ export class CheckoutPage {
     }
   }
 
+  // Get the error message if the form has missing or bad information
   async getValidationError(): Promise<string> {
     try {
       await expect(this.errorMessage).toBeVisible({ timeout: 5000 });
@@ -78,6 +85,7 @@ export class CheckoutPage {
 
   async verifySummary(expectedItemPrice: number) {
     try {
+      // Get the prices shown on the order review page
       const subtotalText = await this.subtotalLabel.textContent();
       const taxText = await this.taxLabel.textContent();
       const totalText = await this.totalLabel.textContent();
@@ -90,6 +98,7 @@ export class CheckoutPage {
         throw new Error(`Unable to parse checkout summary values: subtotal=${subtotalText}, tax=${taxText}, total=${totalText}`);
       }
 
+      // Check that the subtotal is correct and the total equals subtotal plus tax
       expect(subtotal).toBe(expectedItemPrice);
       expect(total).toBeCloseTo(subtotal + tax, 2);
       console.log(`Checkout summary validated: subtotal=${subtotal}, tax=${tax}, total=${total}`);
@@ -100,6 +109,7 @@ export class CheckoutPage {
     }
   }
 
+  // Click the finish button to complete the purchase
   async completeCheckout() {
     try {
       await expect(this.finishButton).toBeVisible({ timeout: 5000 });
@@ -113,6 +123,7 @@ export class CheckoutPage {
     }
   }
 
+  // Check that the success message appears after purchase is done
   async verifySuccessMessage() {
     try {
       await expect(this.completeHeader).toHaveText('Thank you for your order!');

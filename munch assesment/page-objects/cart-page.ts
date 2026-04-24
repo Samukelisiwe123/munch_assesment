@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 
+// CartPage handles all shopping cart actions like adding, removing, and checking out items
 export class CartPage {
     readonly page: Page;
     readonly inventoryItems: Locator;
@@ -13,6 +14,7 @@ export class CartPage {
         this.badge = page.locator('.shopping_cart_badge');
     }
 
+    // Add a certain number of products to the cart
     async addItems(count: number) {
         try {
             await expect(this.inventoryItems.first()).toBeVisible({ timeout: 5000 });
@@ -37,6 +39,7 @@ export class CartPage {
         }
     }
 
+    // Remove an item from the product list by its position
     async removeItemByIndex(index: number) {
         try {
             const count = await this.inventoryItems.count();
@@ -57,6 +60,7 @@ export class CartPage {
         }
     }
 
+    // Get the number of items shown in the cart badge
     async getCartCount(): Promise<number> {
         try {
             if (!await this.badge.isVisible()) {
@@ -74,6 +78,7 @@ export class CartPage {
         }
     }
 
+    // Click the cart button to go to the cart page
     async openCart() {
         try {
             await expect(this.page.locator('.shopping_cart_link')).toBeVisible({ timeout: 5000 });
@@ -85,6 +90,7 @@ export class CartPage {
         }
     }
 
+    // Click the checkout button from the cart page
     async checkout() {
         try {
             await expect(this.page.locator('[data-test="checkout"]')).toBeVisible({ timeout: 5000 });
@@ -96,6 +102,7 @@ export class CartPage {
         }
     }
 
+    // Remove all items from the cart by clicking the Remove button on each
     async clearCart() {
         try {
             let removeButtons = this.page.locator('.inventory_item button:has-text("Remove")');
@@ -115,6 +122,7 @@ export class CartPage {
         }
     }
 
+    // Count how many items are on the cart page
     async getCartItemCount(): Promise<number> {
         try {
             await expect(this.cartItems.first()).toBeVisible({ timeout: 5000 });
